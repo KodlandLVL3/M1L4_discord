@@ -2,8 +2,6 @@ import discord
 from discord.ext import commands
 from config import token
 from logic import Pokemon
-from discord import File
-from io import BytesIO
 
 # Настройка интентов для бота
 intents = discord.Intents.default()  # Получаем настройки по умолчанию
@@ -27,11 +25,11 @@ async def go(ctx):
     if author not in Pokemon.pokemons.keys():
         pokemon = Pokemon(author)  # Создаем нового покемона
         await ctx.send(await pokemon.info())  # Отправляем информацию о покемоне
-        image_data = await pokemon.show_img()  # Получаем изображение покемона
-        if image_data:
-            image_stream = BytesIO(image_data)  # Создаем поток для изображения
-            image_stream.seek(0)  # Перемещаем указатель в начало потока
-            await ctx.send(file=File(fp=image_stream, filename='pokemon.png'))  # Отправляем изображение
+        image_url = await pokemon.show_img()  # Получаем URL изображения покемона
+        if image_url:
+            embed = discord.Embed()  # Создаем встраиваемое сообщение (embed)
+            embed.set_image(url=image_url)  # Устанавливаем изображение покемона
+            await ctx.send(embed=embed)  # Отправляем встраиваемое сообщение с изображением
         else:
             await ctx.send("Не удалось загрузить изображение покемона.")
     else:
